@@ -117,6 +117,7 @@
     white-space: nowrap;
   }
   .hdr-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+  .hdr-btn .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:#22c55e; margin-left:5px; vertical-align:middle; }
 
   #key-section {
     padding: 10px 18px;
@@ -433,9 +434,22 @@ themeToggle.addEventListener('click', () => {
 const savedKey = localStorage.getItem(API_KEY_KEY);
 if (savedKey) apiKeyInput.value = savedKey;
 
+function updateKeyIndicator() {
+  const hasKey = !!(apiKeyInput.value.trim() || localStorage.getItem(API_KEY_KEY));
+  const dot = keyToggle.querySelector('.dot');
+  if (hasKey && !dot) {
+    keyToggle.insertAdjacentHTML('beforeend', '<span class="dot" title="API key saved"></span>');
+  } else if (!hasKey && dot) {
+    dot.remove();
+  }
+}
+
 apiKeyInput.addEventListener('change', () => {
   localStorage.setItem(API_KEY_KEY, apiKeyInput.value.trim());
+  updateKeyIndicator();
 });
+
+updateKeyIndicator();
 
 keyToggle.addEventListener('click', () => keySection.classList.toggle('open'));
 
