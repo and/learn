@@ -1,273 +1,351 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Topic Explorer</title>
 <style>
+  :root {
+    --bg:              #0f1117;
+    --surface:         #161b2e;
+    --surface-hover:   #1a2035;
+    --border:          #1e2433;
+    --border-input:    #2d3748;
+    --border-focus:    #7c3aed;
+    --text-primary:    #f1f5f9;
+    --text-secondary:  #94a3b8;
+    --text-muted:      #8392a8;
+    --accent:          #7c3aed;
+    --accent-hover:    #6d28d9;
+    --accent-fg:       #ffffff;
+    --accent-dis-bg:   #3b2a6a;
+    --accent-dis-fg:   #7c6aab;
+    --header-title:    #a78bfa;
+    --err-bg:          #2d1515;
+    --err-border:      #7f1d1d;
+    --err-text:        #fca5a5;
+    --badge-beg-bg:    #14532d; --badge-beg-fg: #86efac;
+    --badge-int-bg:    #713f12; --badge-int-fg: #fde68a;
+    --badge-adv-bg:    #7f1d1d; --badge-adv-fg: #fca5a5;
+    --badge-field-bg:  #1e1b4b; --badge-field-fg: #a5b4fc;
+    --card-prereq:     #7c3aed;
+    --card-connected:  #0891b2;
+    --card-next:       #059669;
+    --history-bg:      #161b2e;
+    --history-border:  #2d3748;
+    --history-fg:      #94a3b8;
+    --history-fg-hov:  #c4b5fd;
+    --history-bord-hov:#7c3aed;
+    --clear-fg:        #4b5563;
+    --clear-fg-hov:    #ef4444;
+  }
+
+  [data-theme="light"] {
+    --bg:              #f8fafc;
+    --surface:         #ffffff;
+    --surface-hover:   #f1f5f9;
+    --border:          #e2e8f0;
+    --border-input:    #cbd5e1;
+    --border-focus:    #6d28d9;
+    --text-primary:    #1e293b;
+    --text-secondary:  #475569;
+    --text-muted:      #64748b;
+    --accent:          #6d28d9;
+    --accent-hover:    #5b21b6;
+    --accent-fg:       #ffffff;
+    --accent-dis-bg:   #ede9fe;
+    --accent-dis-fg:   #7c3aed;
+    --header-title:    #5b21b6;
+    --err-bg:          #fef2f2;
+    --err-border:      #fecaca;
+    --err-text:        #991b1b;
+    --badge-beg-bg:    #dcfce7; --badge-beg-fg: #166534;
+    --badge-int-bg:    #fef3c7; --badge-int-fg: #92400e;
+    --badge-adv-bg:    #fee2e2; --badge-adv-fg: #991b1b;
+    --badge-field-bg:  #ede9fe; --badge-field-fg: #4c1d95;
+    --card-prereq:     #6d28d9;
+    --card-connected:  #0e7490;
+    --card-next:       #047857;
+    --history-bg:      #f1f5f9;
+    --history-border:  #cbd5e1;
+    --history-fg:      #475569;
+    --history-fg-hov:  #5b21b6;
+    --history-bord-hov:#6d28d9;
+    --clear-fg:        #94a3b8;
+    --clear-fg-hov:    #dc2626;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #0f1117;
-    color: #e2e8f0;
+    background: var(--bg);
+    color: var(--text-primary);
     min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: background 0.2s, color 0.2s;
   }
 
   header {
-    padding: 20px 24px;
-    border-bottom: 1px solid #1e2433;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
   }
 
   header h1 {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: #a78bfa;
-    letter-spacing: -0.02em;
+    color: var(--header-title);
+    letter-spacing: -0.01em;
   }
 
-  #key-toggle {
+  .header-actions { display: flex; gap: 6px; align-items: center; }
+
+  .hdr-btn {
     background: none;
-    border: 1px solid #2d3748;
-    color: #94a3b8;
-    padding: 6px 12px;
-    border-radius: 6px;
+    border: 1px solid var(--border-input);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 0.8rem;
-    transition: border-color 0.15s;
+    font-size: 0.78rem;
+    transition: border-color 0.15s, color 0.15s;
+    white-space: nowrap;
   }
-  #key-toggle:hover { border-color: #4a5568; color: #e2e8f0; }
+  .hdr-btn:hover { border-color: var(--accent); color: var(--text-primary); }
 
   #key-section {
-    padding: 12px 24px;
-    background: #161b2e;
-    border-bottom: 1px solid #1e2433;
+    padding: 10px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     display: none;
   }
   #key-section.open { display: block; }
 
   #key-section label {
-    font-size: 0.75rem;
-    color: #64748b;
+    font-size: 0.72rem;
+    color: var(--text-muted);
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
 
   #key-section input {
     width: 100%;
-    max-width: 480px;
-    background: #0f1117;
-    border: 1px solid #2d3748;
-    color: #e2e8f0;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    max-width: 440px;
+    background: var(--bg);
+    border: 1px solid var(--border-input);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 0.82rem;
     font-family: monospace;
     outline: none;
+    transition: border-color 0.15s;
   }
-  #key-section input:focus { border-color: #7c3aed; }
+  #key-section input:focus { border-color: var(--border-focus); }
 
   main {
-    max-width: 860px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 32px 24px;
+    padding: 20px 18px;
   }
 
   .search-row {
     display: flex;
-    gap: 10px;
-    margin-bottom: 32px;
+    gap: 8px;
+    margin-bottom: 20px;
   }
 
   #topic-input {
     flex: 1;
-    background: #161b2e;
-    border: 1px solid #2d3748;
-    color: #e2e8f0;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border-input);
+    color: var(--text-primary);
+    padding: 9px 13px;
+    border-radius: 6px;
+    font-size: 0.92rem;
     outline: none;
     transition: border-color 0.15s;
   }
-  #topic-input:focus { border-color: #7c3aed; }
-  #topic-input::placeholder { color: #3a4559; }
+  #topic-input:focus { border-color: var(--border-focus); }
+  #topic-input::placeholder { color: var(--text-muted); opacity: 0.7; }
 
   #explore-btn {
-    background: #7c3aed;
-    color: #fff;
+    background: var(--accent);
+    color: var(--accent-fg);
     border: none;
-    padding: 12px 22px;
-    border-radius: 8px;
-    font-size: 0.95rem;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-size: 0.88rem;
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.15s;
   }
-  #explore-btn:hover { background: #6d28d9; }
-  #explore-btn:disabled { background: #3b2a6a; color: #7c6aab; cursor: not-allowed; }
+  #explore-btn:hover { background: var(--accent-hover); }
+  #explore-btn:disabled { background: var(--accent-dis-bg); color: var(--accent-dis-fg); cursor: not-allowed; }
 
   #error-msg {
-    background: #2d1515;
-    border: 1px solid #7f1d1d;
-    color: #fca5a5;
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    margin-bottom: 20px;
+    background: var(--err-bg);
+    border: 1px solid var(--err-border);
+    color: var(--err-text);
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 0.82rem;
+    margin-bottom: 16px;
     display: none;
   }
 
   .spinner {
     display: none;
     text-align: center;
-    padding: 48px 0;
-    color: #4a5568;
-    font-size: 0.9rem;
+    padding: 36px 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
   }
   .spinner.active { display: block; }
   .spinner::before {
     content: '';
     display: block;
-    width: 32px;
-    height: 32px;
-    border: 3px solid #2d3748;
-    border-top-color: #7c3aed;
+    width: 26px;
+    height: 26px;
+    border: 2px solid var(--border-input);
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
-    margin: 0 auto 12px;
+    margin: 0 auto 10px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   #result { display: none; }
 
-  .topic-header {
-    margin-bottom: 28px;
-  }
+  .topic-header { margin-bottom: 18px; }
 
   .topic-header h2 {
-    font-size: 1.6rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #c4b5fd;
-    margin-bottom: 8px;
+    color: var(--text-primary);
+    margin-bottom: 5px;
   }
 
   .topic-header p {
-    color: #94a3b8;
-    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
     line-height: 1.5;
   }
 
   .meta-row {
     display: flex;
-    gap: 10px;
-    margin-top: 12px;
+    gap: 6px;
+    margin-top: 8px;
     flex-wrap: wrap;
   }
 
   .badge {
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 99px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
-  .badge-level-beginner   { background: #14532d; color: #86efac; }
-  .badge-level-intermediate { background: #713f12; color: #fde68a; }
-  .badge-level-advanced   { background: #7f1d1d; color: #fca5a5; }
-  .badge-field { background: #1e1b4b; color: #a5b4fc; }
+  .badge-level-beginner     { background: var(--badge-beg-bg); color: var(--badge-beg-fg); }
+  .badge-level-intermediate { background: var(--badge-int-bg); color: var(--badge-int-fg); }
+  .badge-level-advanced     { background: var(--badge-adv-bg); color: var(--badge-adv-fg); }
+  .badge-field { background: var(--badge-field-bg); color: var(--badge-field-fg); }
 
-  .section {
-    margin-bottom: 28px;
-  }
+  .section { margin-bottom: 18px; }
 
   .section-title {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #4a5568;
-    margin-bottom: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
   }
 
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 7px;
   }
 
   .card {
-    background: #161b2e;
-    border: 1px solid #1e2433;
-    border-radius: 8px;
-    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 11px;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
   }
-  .card:hover { border-color: #7c3aed; background: #1a1f35; }
+  .card:hover { border-color: var(--accent); background: var(--surface-hover); }
 
   .card-name {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    color: #e2e8f0;
-    margin-bottom: 4px;
+    color: var(--text-primary);
+    margin-bottom: 3px;
   }
 
   .card-why {
-    font-size: 0.78rem;
-    color: #64748b;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
     line-height: 1.4;
   }
 
-  .card.prereq { border-left: 3px solid #7c3aed; }
-  .card.connected { border-left: 3px solid #0891b2; }
-  .card.next { border-left: 3px solid #059669; }
+  .card.prereq    { border-left: 3px solid var(--card-prereq); }
+  .card.connected { border-left: 3px solid var(--card-connected); }
+  .card.next      { border-left: 3px solid var(--card-next); }
 
-  /* history sidebar */
   #history-section {
-    margin-top: 40px;
-    padding-top: 28px;
-    border-top: 1px solid #1e2433;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
   }
 
   #history-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+    margin-top: 8px;
   }
 
   .history-tag {
-    background: #161b2e;
-    border: 1px solid #2d3748;
-    color: #94a3b8;
-    padding: 5px 12px;
+    background: var(--history-bg);
+    border: 1px solid var(--history-border);
+    color: var(--history-fg);
+    padding: 3px 10px;
     border-radius: 99px;
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s;
   }
-  .history-tag:hover { border-color: #7c3aed; color: #c4b5fd; }
+  .history-tag:hover { border-color: var(--history-bord-hov); color: var(--history-fg-hov); }
 
   .clear-btn {
     background: none;
     border: none;
-    color: #374151;
-    font-size: 0.75rem;
+    color: var(--clear-fg);
+    font-size: 0.72rem;
     cursor: pointer;
-    margin-left: 8px;
+    margin-left: 6px;
+    transition: color 0.15s;
   }
-  .clear-btn:hover { color: #ef4444; }
+  .clear-btn:hover { color: var(--clear-fg-hov); }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🔭 Topic Explorer</h1>
-  <button id="key-toggle">⚙ API Key</button>
+  <div class="header-actions">
+    <button class="hdr-btn" id="theme-toggle" aria-label="Toggle theme">☀ Light</button>
+    <button class="hdr-btn" id="key-toggle">⚙ API Key</button>
+  </div>
 </header>
 
 <div id="key-section">
@@ -311,7 +389,7 @@
   </div>
 
   <div id="history-section" style="display:none">
-    <div class="section-title" style="margin-bottom:12px">
+    <div class="section-title">
       Previously explored
       <button class="clear-btn" id="clear-history">clear</button>
     </div>
@@ -320,8 +398,9 @@
 </main>
 
 <script>
-const STORAGE_KEY = 'topic_explorer_history';
-const API_KEY_KEY = 'topic_explorer_apikey';
+const STORAGE_KEY  = 'topic_explorer_history';
+const API_KEY_KEY  = 'topic_explorer_apikey';
+const THEME_KEY    = 'topic_explorer_theme';
 
 const keyToggle    = document.getElementById('key-toggle');
 const keySection   = document.getElementById('key-section');
@@ -333,8 +412,24 @@ const spinner      = document.getElementById('spinner');
 const result       = document.getElementById('result');
 const historySec   = document.getElementById('history-section');
 const historyList  = document.getElementById('history-list');
+const themeToggle  = document.getElementById('theme-toggle');
 
-// Restore API key
+// ── Theme ─────────────────────────────────────────────────────
+const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+applyTheme(savedTheme);
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggle.textContent = theme === 'dark' ? '☀ Light' : '☾ Dark';
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+// ── API Key ───────────────────────────────────────────────────
 const savedKey = localStorage.getItem(API_KEY_KEY);
 if (savedKey) apiKeyInput.value = savedKey;
 
@@ -344,7 +439,7 @@ apiKeyInput.addEventListener('change', () => {
 
 keyToggle.addEventListener('click', () => keySection.classList.toggle('open'));
 
-// ── History ──────────────────────────────────────────────────
+// ── History ───────────────────────────────────────────────────
 function getHistory() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
   catch { return {}; }
@@ -380,7 +475,7 @@ document.getElementById('clear-history').addEventListener('click', () => {
 
 renderHistory();
 
-// ── API call ─────────────────────────────────────────────────
+// ── API call ──────────────────────────────────────────────────
 async function exploreTopic(topic) {
   const apiKey = apiKeyInput.value.trim() || localStorage.getItem(API_KEY_KEY) || '';
   if (!apiKey) throw new Error('Please enter your Anthropic API key (click ⚙ API Key above).');
@@ -429,7 +524,6 @@ Include 3–6 items in each array. Return only the JSON object.`;
   try {
     return JSON.parse(text);
   } catch {
-    // try to extract JSON from the text
     const match = text.match(/\{[\s\S]*\}/);
     if (match) return JSON.parse(match[0]);
     throw new Error('Could not parse response. Try again.');
@@ -462,7 +556,6 @@ function displayResult(data) {
 
   result.style.display = 'block';
 
-  // Click a card to explore that topic
   result.querySelectorAll('.card').forEach(card => {
     card.addEventListener('click', () => {
       topicInput.value = card.dataset.topic;
@@ -477,9 +570,7 @@ function showError(msg) {
   errorMsg.style.display = 'block';
 }
 
-function clearError() {
-  errorMsg.style.display = 'none';
-}
+function clearError() { errorMsg.style.display = 'none'; }
 
 async function run(topic) {
   clearError();
@@ -487,7 +578,6 @@ async function run(topic) {
   spinner.classList.add('active');
   exploreBtn.disabled = true;
 
-  // Check local cache first
   const h = getHistory();
   const cached = h[topic.toLowerCase()];
   if (cached) {
